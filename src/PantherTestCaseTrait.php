@@ -69,7 +69,7 @@ trait PantherTestCaseTrait
 
     public static function tearDownAfterClass(): void
     {
-        if (self::$stopServerOnTeardown) {
+        if (PantherTestCase::$stopServerOnTeardown) {
             static::stopWebServer();
         }
     }
