@@ -53,6 +53,5 @@ trait WebServerReadinessProbeTrait
             // block until the web server is ready
             usleep(1000);
         }
-        sleep(1);
     }
 }
