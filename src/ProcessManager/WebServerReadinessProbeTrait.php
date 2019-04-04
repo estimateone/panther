@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Panther\ProcessManager;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -38,20 +40,26 @@ trait WebServerReadinessProbeTrait
 
     public function waitUntilReady(Process $process, string $url, bool $ignoreErrors = false): void
     {
-        $context = stream_context_create(['http' => [
-            'ignore_errors' => $ignoreErrors,
-            'protocol_version' => '1.1',
-            'header' => ['Connection: close'],
-            'timeout' => 5,
-        ]]);
+        $client =  new Client([
+            'timeout'  => 5,
+        ]);
 
-        while (Process::STATUS_STARTED !== ($status = $process->getStatus()) || false === @file_get_contents($url, false, $context)) {
-            if (Process::STATUS_TERMINATED === $status) {
-                throw new \RuntimeException($process->getErrorOutput(), $process->getExitCode());
+        while (true) {
+            $status = $process->getStatus();
+            if (Process::STATUS_STARTED !== $status) {
+                usleep(1000);
+                continue;
             }
 
-            // block until the web server is ready
-            usleep(1000);
+            try {
+                $response = $client->request('GET', $url);
+                $ready = 200 === $response->getStatusCode();
+            } catch (GuzzleException $e) {
+                $ready = false;
+            }
+            if ($ready) {
+                break;
+            }
         }
     }
 }
