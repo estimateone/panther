@@ -1,12 +1,13 @@
----------ChromeDriver 78.0.3904.70 (2019-10-21)---------
-Supports Chrome version 78
-Resolved issue 907: PageLoadTimeout ignored when setting Url [Pri-2]
-Resolved issue 2212: Implement Permissions Automation
-Resolved issue 3044: Unable to interact with dropdown options using Action in ChromeDriver 76 [Pri-2]
-Resolved issue 3047: No matching capabilities found if ChromeOptions() is used [Pri-2]
-Resolved issue 3074: Adding function to Object.prototype causes difficulties in JavaScript deserialization [Pri-1]
-Resolved issue 3078: ChromeDriver 77.0.3865.19 and later does not work with Android [Pri-1]
-Resolved issue 3084: Find Elements not working properly in ChromeDriver 76 when prototype.js 1.6.1 is used [Pri-2]
-Resolved issue 3103: ChromeDriver 77.0.3865.40 is returning the result of a Java Script Execution wrong (Coming null instead of complete) [Pri-1]
-Resolved issue 3106: Download in headless mode does not honor download.default_directory
-Resolved issue 3136: Unable to take a screenshot when page is zoomed out to 25%.
+---------ChromeDriver 80.0.3987.16 (2019-12-19)---------
+Supports Chrome version 80
+Resolved issue 3155: Load page was aborted when using a proxy (v.77/78). [Pri-2]
+Resolved issue 3164: Chromedriver version 77 doesn`t wait for page to fully load before interacting with an element [Pri-2]
+Resolved issue 3179: ChromeDriver log should include the port used by the driver [Pri-2]
+Resolved issue 3180: Enable SetGeoLocation for w3c mode [Pri-]
+Resolved issue 3184: UnexpectedAlertOpen status should always include Alert text [Pri-3]
+Resolved issue 3188: Improve message when CRX2 Extension is loaded [Pri-2]
+Resolved issue 3196: ChromeDriver 78 race condition in ExecuteGetPageSource may result in JavascriptException [Pri-2]
+Resolved issue 3226: add --ignore-certificate-errors flag when acceptInsecureCerts true [Pri-2]
+Resolved issue 3230: Update error message and return status for no such execution context [Pri-2]
+Resolved issue 3239: ChromeDriver may block indefinitely while waiting for pending navigation [Pri-2]
+Resolved issue 3264: Allow setting SameSite cookie attribute [Pri-]
