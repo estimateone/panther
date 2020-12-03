@@ -46,10 +46,15 @@ final class ChromeManager implements BrowserManagerInterface
         if (!$this->process->isRunning()) {
             $this->checkPortAvailable($this->options['host'], $this->options['port']);
             $this->process->start();
-            $this->waitUntilReady($this->process, $url.$this->options['path']);
+            $this->waitUntilReady($this->process, $url.$this->options['path'], 'chrome');
         }
 
         $capabilities = DesiredCapabilities::chrome();
+
+        foreach ($this->options['capabilities'] as $capability => $value) {
+            $capabilities->setCapability($capability, $value);
+        }
+
         if ($this->arguments) {
             $chromeOptions = new ChromeOptions();
             $chromeOptions->addArguments($this->arguments);
@@ -59,7 +64,7 @@ final class ChromeManager implements BrowserManagerInterface
             }
         }
 
-        return RemoteWebDriver::create($url, $capabilities);
+        return RemoteWebDriver::create($url, $capabilities, $this->options['connection_timeout_in_ms'] ?? null, $this->options['request_timeout_in_ms'] ?? null);
     }
 
     public function quit(): void
@@ -110,6 +115,7 @@ final class ChromeManager implements BrowserManagerInterface
             'host' => '127.0.0.1',
             'port' => 9515,
             'path' => '/status',
+            'capabilities' => [],
         ];
     }
 }

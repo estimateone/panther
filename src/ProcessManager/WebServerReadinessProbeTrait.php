@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Panther\ProcessManager;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Process\Process;
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 
 /**
  * @internal
@@ -38,28 +38,48 @@ trait WebServerReadinessProbeTrait
         }
     }
 
-    public function waitUntilReady(Process $process, string $url, bool $ignoreErrors = false): void
+    public function waitUntilReady(Process $process, string $url, string $service, bool $allowNotOkStatusCode = false, int $timeout = 30): void
     {
-        $client =  new Client([
-            'timeout'  => 5,
-        ]);
+        $client = HttpClient::create(['timeout' => $timeout]);
+
+        $start = microtime(true);
 
         while (true) {
             $status = $process->getStatus();
+            if (Process::STATUS_TERMINATED === $status) {
+                throw new \RuntimeException(sprintf('Could not start %s. Exit code: %d (%s). Error output: %s', $service, $process->getExitCode(), $process->getExitCodeText(), $process->getErrorOutput()));
+            }
+
             if (Process::STATUS_STARTED !== $status) {
+                if (microtime(true) - $start >= $timeout) {
+                    throw new \RuntimeException("Could not start $service (or it crashed) after $timeout seconds.");
+                }
+
                 usleep(1000);
+
                 continue;
             }
 
+            $response = $client->request('GET', $url);
+            $e = $statusCode = null;
             try {
-                $response = $client->request('GET', $url);
-                $ready = 200 === $response->getStatusCode();
-            } catch (GuzzleException $e) {
-                $ready = false;
+                $statusCode = $response->getStatusCode();
+                if ($allowNotOkStatusCode || 200 === $statusCode) {
+                    return;
+                }
+            } catch (ExceptionInterface $e) {
             }
-            if ($ready) {
-                break;
+
+            if (microtime(true) - $start >= $timeout) {
+                if ($e) {
+                    $message = $e->getMessage();
+                } else {
+                    $message = "Status code: $statusCode";
+                }
+                throw new \RuntimeException("Could not connect to $service after $timeout seconds ($message).");
             }
+
+            usleep(1000);
         }
     }
 }
